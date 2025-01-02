@@ -5,8 +5,8 @@ import warnings
 from sanic import json, Request
 from sanic_ext import openapi
 from bson import ObjectId
-from App.api import api
 from App import create_app
+from App.api import api
 from App.database.mongodb.database_store import Database
 from App.misc.log import log
 from App.utils.logger_utils import get_logger
@@ -18,6 +18,8 @@ warnings.filterwarnings('ignore')
 logger = get_logger('Main')
 
 app = create_app(Config, LocalDBConfig)
+app.ext.openapi.add_security_scheme('Authorization', 'apiKey', location='header', name='Authorization')
+
 
 app.blueprint(api)
 

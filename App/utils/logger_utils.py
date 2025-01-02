@@ -24,3 +24,4 @@ def get_logger(logger_name):
     logger.addHandler(get_console_handler())
     # logger.addHandler(get_file_handler())
     return logger
+

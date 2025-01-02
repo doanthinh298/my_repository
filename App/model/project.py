@@ -1,5 +1,4 @@
-from typing import Optional
-
+from typing import Optional, List
 
 from pydantic import BaseModel, Field
 
@@ -7,15 +6,18 @@ from pydantic import BaseModel, Field
 class Product(BaseModel):
     _id: Optional[int] = None
     name: Optional[str] = None
+    category:str
     price: Optional[int]  = None
     description: Optional[str]  = None
 
 
 class Order(BaseModel):
-    _id: Optional[int] = None
-    order_date: Optional[int] = None
-    status: Optional[int] = None
-
+    user_id: str
+    address: str
+    phone: str
+    items: list
+    total_price: float
+    status: str = 'pending'
 
 class User(BaseModel):
     name: Optional[str] = None
@@ -26,13 +28,16 @@ class User(BaseModel):
 
 
 class Create_Product(BaseModel):
-    name :str
-    category:str
+    name: str
+    description: str
+    category: str
     price: int
-    stock : int
+    stock: int
+
 
 class Update_Product(BaseModel):
     name: str
+    description : str
     category: str
     price: int
     stock: int
@@ -51,3 +56,15 @@ class Register_User(BaseModel):
     password: str
     address: str
     phone: int
+
+class AddToCartModel(BaseModel):
+    product_id: str
+    quantity: int
+
+class GetCart(BaseModel):
+    user_id: str
+
+class UpdateCartModel(BaseModel):
+    user_id :str
+    product: str
+

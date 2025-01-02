@@ -5,6 +5,7 @@ class Product:
     def __init__(self,_id =''):
         self.id = _id
         self.name = ''
+        self.description = ''
         self.category = ''
         self.price = ''
         self.stock = ''
@@ -13,6 +14,7 @@ class Product:
         return {
             "_id": self.id,
             "name": self.name,
+            "description":self.description,
             "category": self.category,
             "price": self.price,
             'stock': self.stock
@@ -23,6 +25,7 @@ class Product:
         id_ = json_dict['_id']
         product = Product(id_)
         product.name = json_dict['name']
+        product.name = json_dict['description']
         product.category = json_dict['category']
         product.price = json_dict['price']
         product.stock = json_dict['stock']

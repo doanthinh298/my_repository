@@ -1,6 +1,5 @@
 from termcolor import colored
 
-
 def log(message: str, keyword: str = "WARN"):
     if keyword == "WARN":
         print(colored('[WARN]', 'yellow'), message)

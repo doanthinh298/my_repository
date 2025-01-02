@@ -7,7 +7,7 @@ from sanic import Request
 from App.model.User import User
 from App.utils.bcrypt import register_hash_password, check_password, hash_password
 from App.model.project import Login_User,Register_User
-from App.utils.jwt import generate_token
+from App.utils.jwt import generate_token, jwt_required
 from App.utils.logger_utils import get_logger
 
 
@@ -26,17 +26,6 @@ user = Blueprint('user', url_prefix='/user')
 #     user_id = db.create_user(user_data)
 #     return response.json({"user_id": str(user_id)})
 
-@user.get("/user/<user_id>")
-@openapi.definition(
-    summary="Retrieve a user's details",
-    tag="User Management"
-)
-async def get_user(request, user_id):
-    user = db.read_user(user_id)
-    if user:
-        return response.json(user)
-    return response.json({"error": "User not found"}, status=404)
-
 # @user.put("/user/<user_id>")
 # @openapi.definition(
 #     summary="Update user information",
@@ -50,6 +39,19 @@ async def get_user(request, user_id):
 #         return response.json({"message": "User updated successfully"})
 #     return response.json({"error": "User not found"}, status=404)
 
+
+
+@user.get("/user/get/<user_id>")
+@openapi.definition(
+    summary="Get a user",
+    tag="User Management"
+)
+async def get_user(request, user_id):
+    user_data = db.read_user(user_id)
+    if user_data:
+        user_data["_id"] = str(user_data["_id"])
+        return response.json(user_data)
+    return response.json({"error": "User not found"}, status=404)
 
 @user.delete("/user/delete/<user_id>")
 @openapi.definition(
@@ -80,16 +82,15 @@ async def register(request, body: Register_User):
     address = body.address
     phone = body.phone
 
+    existing_email = db.find_by_email(email)
+    if existing_email:
+        return response.json({"error": "Email đã tồn tại"}, status=400)
+
+    existing_user = db.find_by_user(name)
+    if existing_user:
+        return response.json({"error": "Username đã tồn tại"}, status=400)
+
     hashed_password = hash_password(password)
-    print(hashed_password)
-
-    # if all([name, email, password, address, phone]):
-    #     return response.json({"error": "All fields are required"}, status=400)
-
-    # user_model = User
-    # existing_user = db.create_user(user_model)
-    # if existing_user:
-    #     return response.json({"error": "Email already exists"}, status=400)
 
     user_data = {
         "name": name,
@@ -122,10 +123,10 @@ async def login(request, body: Login_User):
     user = db.find_by_user(name)
 
     if not user:
-        return response.json({"error": "Invalid email or password"}, status=401)
+        return response.json({"error": "Invalid name or password"}, status=401)
 
     if not check_password(password, user['password']):
-        return response.json({"error": "Invalid email or password"}, status=401)
+        return response.json({"error": "Invalid name or password"}, status=401)
 
     token = generate_token(user['_id'])
 
