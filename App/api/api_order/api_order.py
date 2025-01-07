@@ -37,7 +37,6 @@ async def place_order(request):
         if not cart_items:
             raise SanicException("Giỏ hàng trống", status_code=400)
 
-        # Tạo đơn hàng mới
         order_data = {
             "user_id": user_id,
             "products": products,
