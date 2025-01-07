@@ -11,33 +11,10 @@ from App.utils.jwt import generate_token, jwt_required
 from App.utils.logger_utils import get_logger
 
 
-logger = get_logger("crud_api")
+logger = get_logger("crud_api_user")
 db = Database()
 user = Blueprint('user', url_prefix='/user')
 
-# @user.post("/user")
-# @openapi.definition(
-#     summary="Create a new user",
-#     tag="User Management"
-# )
-# @validate(json=User)
-# async def create_user(request):
-#     user_data = request.json
-#     user_id = db.create_user(user_data)
-#     return response.json({"user_id": str(user_id)})
-
-# @user.put("/user/<user_id>")
-# @openapi.definition(
-#     summary="Update user information",
-#     tag="User Management"
-# )
-# @validate(json=User)
-# async def update_user(request, user_id):
-#     update_data = request.json
-#     result = db.update_user(user_id, update_data)
-#     if result.modified_count:
-#         return response.json({"message": "User updated successfully"})
-#     return response.json({"error": "User not found"}, status=404)
 
 
 

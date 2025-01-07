@@ -1,4 +1,5 @@
-from sanic import response, json
+from bson import ObjectId
+from sanic import response, json, SanicException
 from sanic import Request
 from App.database.mongodb.database_store import Database
 from sanic import Blueprint
@@ -7,7 +8,7 @@ from sanic_ext import openapi, validate
 from App.model.project import Product, Create_Product, Update_Product
 from App.utils.logger_utils import get_logger
 
-logger = get_logger("crud_api")
+logger = get_logger("crud_api_product")
 db = Database()
 product = Blueprint('product', url_prefix='/product')
 
@@ -28,15 +29,17 @@ async def create_product(request,body:Create_Product):
     category = body.category
     price = body.price
     stock = body.stock
+    description = body.description
 
     if not name or not category or not price:
         return response.json({"error": "Missing required fields (name, category, price)"}, status=400)
 
     new_product = {
         "name": name,
+        'description':description,
         "category": category,
         "price": price,
-        'stock':stock
+        'stock':stock,
     }
 
     created_product = db.create_product(new_product)
@@ -64,7 +67,8 @@ async def update_product(request, product_id, body: Product):
         "name": body.name,
         "category": body.category,
         "price": body.price,
-        "stock": body.stock
+        "stock": body.stock,
+        "description":body.description
     }
 
     result = db.update_product(product_id, update_data)
@@ -116,3 +120,89 @@ async def get_all_products(request):
 
     return response.json({"error": "No products found"}, status=404)
 
+
+# Tìm kiếm sản phẩm
+#
+# @product.get("/api/products/search")
+# async def search_products(request):
+#     query = request.args.get('query', '').strip()
+#     if not query:
+#         return json({"error": "Yêu cầu tìm kiếm trống!"}, status=400)
+#
+#     try:
+#         limit = max(1, int(request.args.get('limit', 10)))
+#         skip = max(0, int(request.args.get('skip', 0)))
+#
+#         products_cursor = db.read_product(
+#             {"$text": {"$search": query}},
+#             {"_id": 1, "name": 1, "price": 1, "stock": 1}
+#         )
+#
+#         products = products_cursor.skip(skip).limit(limit)
+#
+#         products_list = list(products)
+#
+#         return json({"products": products_list}, status=200)
+#
+#     except ValueError:
+#         return json({"error": "Giá trị limit hoặc skip không hợp lệ!"}, status=400)
+#
+#     except Exception as e:
+#         return json({"error": f"Lỗi không xác định: {str(e)}"}, status=500)
+#
+# # kiem tra ton kho
+# @product.get("/api/product/stock/<product_id>")
+# async def check_stock(request, product_id):
+#     try:
+#         product_id = ObjectId(product_id)
+#     except Exception:
+#         raise SanicException("ID sản phẩm không hợp lệ", status_code=400)
+#
+#     try:
+#         product = db.read_product({"_id": product_id})
+#     except Exception as e:
+#         return json({"error": f"Lỗi khi truy vấn dữ liệu: {str(e)}"}, status=500)
+#
+#     if not product:
+#         raise SanicException("Sản phẩm không tồn tại", status_code=404)
+#
+#     return json({
+#         "product_id": str(product_id),
+#         "name": product.get('name', 'Không có tên'),
+#         "stock": product.get('stock', 0)
+#     }, status=200)
+#
+# # Cập nhật kho hàng
+# @product.put("/api/product/stock/<product_id>/update")
+# async def update_stock(request, product_id):
+#     try:
+#         product_id = ObjectId(product_id)
+#     except Exception:
+#         raise SanicException("ID sản phẩm không hợp lệ", status_code=400)
+#
+#     data = request.json
+#     quantity = data.get('quantity')
+#     if quantity is None or not isinstance(quantity, int):
+#         return json({"error": "Số lượng phải là một số nguyên và không được để trống!"}, status=400)
+#
+#     try:
+#         product = db.read_product({"_id": product_id})
+#     except Exception as e:
+#         return json({"error": f"Lỗi khi truy vấn dữ liệu: {str(e)}"}, status=500)
+#
+#     if not product:
+#         raise SanicException("Sản phẩm không tồn tại", status_code=404)
+#
+#     try:
+#         db.update_product(
+#             {"_id": product_id},
+#             {"$inc": {"stock": quantity}}
+#         )
+#     except Exception as e:
+#         return json({"error": f"Lỗi khi cập nhật dữ liệu: {str(e)}"}, status=500)
+#
+#     return json({
+#         "message": "Số lượng sản phẩm đã được cập nhật!",
+#         "product_id": str(product_id),
+#         "updated_stock": product['stock'] + quantity
+#     }, status=200)

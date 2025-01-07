@@ -1,33 +1,19 @@
+from datetime import datetime
 from typing import Optional, List
-
 from pydantic import BaseModel, Field
 
 
 class Product(BaseModel):
+    id: Optional[str] = None
     _id: Optional[int] = None
     name: Optional[str] = None
-    category:str
-    price: Optional[int]  = None
-    description: Optional[str]  = None
-
-
-class Order(BaseModel):
-    user_id: str
-    address: str
-    phone: str
-    items: list
-    total_price: float
-    status: str = 'pending'
-
-class User(BaseModel):
-    name: Optional[str] = None
-    email: Optional[str] = None
-    password: Optional[str] = None
-    address: Optional[str] = None
-    phone: Optional[int] = None
+    category: str
+    price: Optional[int] = None
+    description: Optional[str] = None
 
 
 class Create_Product(BaseModel):
+    id: Optional[str] = None
     name: str
     description: str
     category: str
@@ -36,18 +22,41 @@ class Create_Product(BaseModel):
 
 
 class Update_Product(BaseModel):
+    id: Optional[str] = None
     name: str
-    description : str
+    description: str
     category: str
     price: int
     stock: int
 
+
+class Order(BaseModel):
+    id: Optional[str] = None
+    user_id: str
+    products: List[dict]
+    total_price: float
+    shipping_address: str
+    status: str = 'pending'
+    created_at: datetime = datetime.utcnow()
+    updated_at: datetime = datetime.utcnow()
+
+
+class User(BaseModel):
+    id: Optional[str] = None
+    user_id: str
+    name: Optional[str] = None
+    email: Optional[str] = None
+    password: Optional[str] = None
+    address: Optional[str] = None
+    phone: Optional[int] = None
+
+
 class Login_User(BaseModel):
     name: str
-    email: Optional[str] =None
+    email: Optional[str] = None
     password: str
-    address: Optional[str] =None
-    phone: Optional[int] =None
+    address: Optional[str] = None
+    phone: Optional[int] = None
 
 
 class Register_User(BaseModel):
@@ -57,14 +66,21 @@ class Register_User(BaseModel):
     address: str
     phone: int
 
+
 class AddToCartModel(BaseModel):
-    product_id: str
+    name: str
     quantity: int
+
+
 
 class GetCart(BaseModel):
     user_id: str
+    items: List[AddToCartModel]
+    total_price: float
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
 
 class UpdateCartModel(BaseModel):
-    user_id :str
+    id: Optional[str] = None
+    user_id: str
     product: str
-
