@@ -1,4 +1,3 @@
-
 from datetime import datetime
 
 from pymongo import MongoClient
@@ -37,18 +36,19 @@ class Database:
         # CRUD cho Product
 
     def create_product(self, product_data):
-        product_data['id'] = str(self.Product.count_documents({}) + 1)
         return self.Product.insert_one(product_data).inserted_id
 
+    def read_all_products(self):
+        return self.Product.find()
+
     def read_product(self, product_id):
-        return self.Product.find_one({"id": product_id})
+        return self.Product.find_one({"_id": ObjectId(product_id)})
 
     def update_product(self, product_id, update_data):
-        return self.Product.update_one({"id": product_id}, {"$set": update_data})
+        return self.Product.update_one({"_id": ObjectId(product_id)}, {"$set": update_data})
 
     def delete_product(self, product_id):
-        return self.Product.delete_one({"id": product_id})
-
+        return self.Product.delete_one({"_id": ObjectId(product_id)})
     def find_product_by_name(self, product_name):
 
         product = self.Product.find_one({"name": product_name})

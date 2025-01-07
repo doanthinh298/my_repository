@@ -1,19 +1,18 @@
 from datetime import datetime
 from typing import Optional, List
+
 from pydantic import BaseModel, Field
 
 
 class Product(BaseModel):
-    id: Optional[str] = None
     _id: Optional[int] = None
     name: Optional[str] = None
-    category: str
-    price: Optional[int] = None
-    description: Optional[str] = None
+    category:str
+    price: Optional[int]  = None
+    description: Optional[str]  = None
 
 
 class Create_Product(BaseModel):
-    id: Optional[str] = None
     name: str
     description: str
     category: str
@@ -22,16 +21,13 @@ class Create_Product(BaseModel):
 
 
 class Update_Product(BaseModel):
-    id: Optional[str] = None
     name: str
-    description: str
+    description : str
     category: str
     price: int
     stock: int
 
-
 class Order(BaseModel):
-    id: Optional[str] = None
     user_id: str
     products: List[dict]
     total_price: float
@@ -40,9 +36,7 @@ class Order(BaseModel):
     created_at: datetime = datetime.utcnow()
     updated_at: datetime = datetime.utcnow()
 
-
 class User(BaseModel):
-    id: Optional[str] = None
     user_id: str
     name: Optional[str] = None
     email: Optional[str] = None
@@ -53,10 +47,10 @@ class User(BaseModel):
 
 class Login_User(BaseModel):
     name: str
-    email: Optional[str] = None
+    email: Optional[str] =None
     password: str
-    address: Optional[str] = None
-    phone: Optional[int] = None
+    address: Optional[str] =None
+    phone: Optional[int] =None
 
 
 class Register_User(BaseModel):
@@ -65,7 +59,6 @@ class Register_User(BaseModel):
     password: str
     address: str
     phone: int
-
 
 class AddToCartModel(BaseModel):
     name: str
@@ -79,6 +72,7 @@ class GetCart(BaseModel):
     total_price: float
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
+
 
 class UpdateCartModel(BaseModel):
     id: Optional[str] = None
