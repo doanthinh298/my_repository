@@ -9,7 +9,6 @@ from App.utils.logger_utils import get_logger
 logger = get_logger("crud_api_order")
 db = Database()
 order = Blueprint('order', url_prefix='/orders')
-
 @order.post("/api/order")
 @openapi.body({"application/json": Order.model_json_schema()})
 @openapi.definition(
@@ -21,9 +20,12 @@ order = Blueprint('order', url_prefix='/orders')
 async def place_order(request):
     try:
         data = request.json
+        logger.error(f"Received order data: {data}")
 
-        if 'user_id' not in data or 'products' not in data or 'total_price' not in data or 'shipping_address' not in data:
-            raise SanicException("Dữ liệu thiếu", status_code=400)
+        required_fields = ['user_id', 'products', 'total_price', 'shipping_address']
+        for field in required_fields:
+            if field not in data:
+                raise SanicException(f"Dữ liệu thiếu: {field}", status_code=400)
 
         user_id = data['user_id']
         products = data['products']
@@ -31,9 +33,11 @@ async def place_order(request):
         shipping_address = data['shipping_address']
 
         cart_items = await db.read_cart({"user_id": user_id})
+        logger.error(f"Cart items: {cart_items}")
         if not cart_items:
             raise SanicException("Giỏ hàng trống", status_code=400)
 
+        # Tạo đơn hàng mới
         order_data = {
             "user_id": user_id,
             "products": products,
@@ -45,6 +49,7 @@ async def place_order(request):
         }
 
         result = await db.create_order(order_data)
+        logger.error(f"Order created with id: {result.inserted_id}")
 
         for product in products:
             await db.update_product(
